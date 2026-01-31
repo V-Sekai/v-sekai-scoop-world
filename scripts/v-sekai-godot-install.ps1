@@ -1,4 +1,5 @@
 # Install export templates for V-Sekai Godot (run by Scoop installer)
+# Use curl.exe (not Invoke-WebRequest / curl alias) for faster, non-streaming downloads
 $release_version = 'latest.v-sekai-editor-279'
 $base_templates_dir = "$env:APPDATA\Godot\export_templates"
 $temp_dir = "$base_templates_dir\.tmp_$release_version"
@@ -7,7 +8,8 @@ New-Item -ItemType Directory -Path $temp_dir -Force | Out-Null
 $templates_url = "https://github.com/V-Sekai/world-godot/releases/download/$release_version/v-sekai-godot-templates.zip.001"
 $templates_sha256 = 'BFD7A64A0E1F477F642A90C111AF73425AB172F7C40ABE5109935B6C73904C79'
 $templates_file_001 = "$temp_dir\v-sekai-godot-templates.zip.001"
-Invoke-WebRequest -Uri $templates_url -OutFile $templates_file_001
+& curl.exe -L -o $templates_file_001 $templates_url
+if ($LASTEXITCODE -ne 0) { throw 'Templates download failed' }
 $hash = Get-FileHash $templates_file_001 -Algorithm SHA256
 if ($hash.Hash -ne $templates_sha256) { throw 'Templates hash mismatch' }
 $templates_combined = "$temp_dir\v-sekai-godot-templates.zip"
@@ -16,14 +18,16 @@ Copy-Item $templates_file_001 $templates_combined
 $symbols_url_001 = "https://github.com/V-Sekai/world-godot/releases/download/$release_version/v-sekai-godot-templates-symbols.zip.001"
 $symbols_sha256_001 = 'E3FC838F3F8A8520EE2346FBE417F85F748699A0B38F062E4881FB2003BAE5CA'
 $symbols_file_001 = "$temp_dir\v-sekai-godot-templates-symbols.zip.001"
-Invoke-WebRequest -Uri $symbols_url_001 -OutFile $symbols_file_001
+& curl.exe -L -o $symbols_file_001 $symbols_url_001
+if ($LASTEXITCODE -ne 0) { throw 'Symbols 001 download failed' }
 $hash = Get-FileHash $symbols_file_001 -Algorithm SHA256
 if ($hash.Hash -ne $symbols_sha256_001) { throw 'Symbols 001 hash mismatch' }
 
 $symbols_url_002 = "https://github.com/V-Sekai/world-godot/releases/download/$release_version/v-sekai-godot-templates-symbols.zip.002"
 $symbols_sha256_002 = '5DF25D79D4C862E314C9E78101A2489F88DEEC733FE76C546EB2DDC151CBBD37'
 $symbols_file_002 = "$temp_dir\v-sekai-godot-templates-symbols.zip.002"
-Invoke-WebRequest -Uri $symbols_url_002 -OutFile $symbols_file_002
+& curl.exe -L -o $symbols_file_002 $symbols_url_002
+if ($LASTEXITCODE -ne 0) { throw 'Symbols 002 download failed' }
 $hash = Get-FileHash $symbols_file_002 -Algorithm SHA256
 if ($hash.Hash -ne $symbols_sha256_002) { throw 'Symbols 002 hash mismatch' }
 

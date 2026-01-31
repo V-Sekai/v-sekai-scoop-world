@@ -1,9 +1,9 @@
 {
-    "version": "latest.v-sekai-editor-279.5",
+    "version": "latest.v-sekai-editor-279.6",
     "description": "V-Sekai Godot Editor",
     "homepage": "https://github.com/V-Sekai/world-godot",
     "license": "MIT",
-    "depends": ["7zip"],
+    "depends": ["7zip", "curl"],
     "architecture": {
         "64bit": {
             "url": "https://github.com/V-Sekai/world-godot/releases/download/latest.v-sekai-editor-279/v-sekai-godot-windows.zip",
@@ -14,7 +14,7 @@
     "bin": [["godot.windows.editor.double.x86_64.llvm.exe", "v-sekai-godot"]],
     "installer": {
         "script": [
-            "powershell -ExecutionPolicy Bypass -Command \"& ([scriptblock]::Create((New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/V-Sekai/v-sekai-scoop-world/main/scripts/v-sekai-godot-install.ps1')))\""
+            "powershell -ExecutionPolicy Bypass -Command \"$scriptPath = Join-Path $env:TEMP 'v-sekai-godot-install.ps1'; curl.exe -L -o $scriptPath 'https://raw.githubusercontent.com/V-Sekai/v-sekai-scoop-world/main/scripts/v-sekai-godot-install.ps1'; & $scriptPath\""
         ]
     }
 }
