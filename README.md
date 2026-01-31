@@ -13,13 +13,13 @@ Use **Rscoop** [A modern, open-source graphical interface (GUI) for managing Win
 Add the bucket:
 
 ```
-scoop bucket add scoop-world https://github.com/V-Sekai/scoop-world
+scoop bucket add v-sekai-scoop-world https://github.com/V-Sekai/v-sekai-scoop-world
 ```
 
 Install apps:
 
 ```
-scoop install scoop-world/<app_name>
+scoop install v-sekai-scoop-world/<app_name>
 ```
 
 ## Apps
