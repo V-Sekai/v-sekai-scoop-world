@@ -77,13 +77,13 @@ git commit -m "Add app-name manifest"
 
 ## Example
 
-Adding vsekai-game:
+Adding v-sekai-game:
 
-1. **Created**: `vsekai-game.json`
+1. **Created**: `v-sekai-game.json`
 2. **Downloaded & hashed**: The Windows .exe file
 3. **Set bin alias**: `vsekai_game`
 4. **Updated**: README.md with entry and command
-5. **Tested**: `scoop install .\vsekai-game.json`
+5. **Tested**: `scoop install .\v-sekai-game.json`
 6. **Verified**: `vsekai_game` command works
 
 ## Common Issues

@@ -85,14 +85,14 @@ git commit -m "Update app-name to version X.Y.Z"
 
 ## Example
 
-Updating vsekai-godot from v1.0 to v2.0:
+Updating v-sekai-godot from v1.0 to v2.0:
 
 1. **Updated version**: `"version": "2.0"`
 2. **Updated URL**: New release tag in URL
 3. **Recalculated hash**: Downloaded new exe and got new hash
 4. **Kept bin alias**: `vsekai_editor` remained the same
 5. **Tested**: Uninstalled v1.0, installed v2.0, verified command
-6. **Committed**: `git commit -m "Update vsekai-godot to 2.0"`
+6. **Committed**: `git commit -m "Update v-sekai-godot to 2.0"`
 
 ## Common Issues
 
