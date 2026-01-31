@@ -28,18 +28,23 @@ $hash = Get-FileHash $symbols_file_002 -Algorithm SHA256
 if ($hash.Hash -ne $symbols_sha256_002) { throw 'Symbols 002 hash mismatch' }
 
 $symbols_combined = "$temp_dir\v-sekai-godot-templates-symbols.zip"
-$content1 = [System.IO.File]::ReadAllBytes($symbols_file_001)
-$content2 = [System.IO.File]::ReadAllBytes($symbols_file_002)
-$combined = $content1 + $content2
-[System.IO.File]::WriteAllBytes($symbols_combined, $combined)
+# Stream-merge parts to avoid OutOfMemory (parts are ~2GB + ~344MB)
+$outStream = [System.IO.File]::Create($symbols_combined)
+try {
+    $in1 = [System.IO.File]::OpenRead($symbols_file_001)
+    try { $in1.CopyTo($outStream) } finally { $in1.Close() }
+    $in2 = [System.IO.File]::OpenRead($symbols_file_002)
+    try { $in2.CopyTo($outStream) } finally { $in2.Close() }
+} finally { $outStream.Close() }
 
 $extract_temp = "$temp_dir\extract"
 New-Item -ItemType Directory -Path $extract_temp -Force | Out-Null
-Expand-Archive -Path $templates_combined -DestinationPath $extract_temp
-Expand-Archive -Path $symbols_combined -DestinationPath $extract_temp
+# Use 7z (Scoop has 7zip) for extraction; -o has no space before path, -y = overwrite
+& 7z x $templates_combined "-o$extract_temp" -y | Out-Null
+& 7z x $symbols_combined "-o$extract_temp" -y | Out-Null
 
 $tpz = Get-ChildItem $extract_temp -Filter *.tpz -Recurse | Select-Object -First 1
-if ($tpz) { Expand-Archive -Path $tpz.FullName -DestinationPath $extract_temp }
+if ($tpz) { & 7z x $tpz.FullName "-o$extract_temp" -y | Out-Null }
 
 $version_file = Get-ChildItem $extract_temp -Filter version.txt -Recurse | Select-Object -First 1
 if ($version_file) {

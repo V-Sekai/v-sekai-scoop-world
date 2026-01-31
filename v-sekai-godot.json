@@ -3,6 +3,7 @@
     "description": "V-Sekai Godot Editor",
     "homepage": "https://github.com/V-Sekai/world-godot",
     "license": "MIT",
+    "depends": ["7zip"],
     "architecture": {
         "64bit": {
             "url": "https://github.com/V-Sekai/world-godot/releases/download/latest.v-sekai-editor-279/v-sekai-godot-windows.zip",
