@@ -1,0 +1,13 @@
+{
+    "version": "0.6.12",
+    "description": "Raster to vector graphics converter (V-Sekai pixel fork)",
+    "homepage": "https://github.com/V-Sekai-fire/vtracer-pixel",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/V-Sekai-fire/vtracer-pixel/releases/download/v0.6.12/vtracer-pixel-windows.zip",
+            "hash": "d61b4cffe43840f1e8f6246fcbef4256f6091aa210ca9ede238d6ec2ba5b806f"
+        }
+    },
+    "bin": [["vtracer-pixel.exe", "vtracer-pixel"]]
+}
