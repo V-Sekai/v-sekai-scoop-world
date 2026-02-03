@@ -1,9 +1,10 @@
 # Install export templates for V-Sekai Godot (run by Scoop installer for v-sekai-godot-templates)
-# Use curl.exe for downloads. If v-sekai-godot-templates.zip.001 exists in app dir (Scoop cache), use it.
+# Use gh release download for assets. If v-sekai-godot-templates.zip.001 exists in app dir (Scoop cache), use it.
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $scriptDir
 
-$release_version = 'latest.v-sekai-editor-279'
+$release_version = 'latest.v-sekai-editor-280'
+$repo = 'V-Sekai/world-godot'
 $base_templates_dir = "$env:APPDATA\Godot\export_templates"
 $temp_dir = "$base_templates_dir\.tmp_$release_version"
 New-Item -ItemType Directory -Path $temp_dir -Force | Out-Null
@@ -18,28 +19,22 @@ if (Test-Path $cached_001) {
     if ($hash.Hash -ne $templates_sha256) { throw 'Templates hash mismatch (cached file)' }
     Copy-Item $templates_file_001 $templates_combined
 } else {
-    $templates_url = "https://github.com/V-Sekai/world-godot/releases/download/$release_version/v-sekai-godot-templates.zip.001"
-    $templates_file_001 = "$temp_dir\v-sekai-godot-templates.zip.001"
-    & curl.exe -L -o $templates_file_001 $templates_url
+    gh release download $release_version --repo $repo -D $temp_dir --pattern 'v-sekai-godot-templates.zip.001'
     if ($LASTEXITCODE -ne 0) { throw 'Templates download failed' }
+    $templates_file_001 = "$temp_dir\v-sekai-godot-templates.zip.001"
     $hash = Get-FileHash $templates_file_001 -Algorithm SHA256
     if ($hash.Hash -ne $templates_sha256) { throw 'Templates hash mismatch' }
     Copy-Item $templates_file_001 $templates_combined
 }
 
-$symbols_url_001 = "https://github.com/V-Sekai/world-godot/releases/download/$release_version/v-sekai-godot-templates-symbols.zip.001"
 $symbols_sha256_001 = 'E3FC838F3F8A8520EE2346FBE417F85F748699A0B38F062E4881FB2003BAE5CA'
+$symbols_sha256_002 = '5DF25D79D4C862E314C9E78101A2489F88DEEC733FE76C546EB2DDC151CBBD37'
+gh release download $release_version --repo $repo -D $temp_dir --pattern 'v-sekai-godot-templates-symbols.zip.001' --pattern 'v-sekai-godot-templates-symbols.zip.002'
+if ($LASTEXITCODE -ne 0) { throw 'Symbols download failed' }
 $symbols_file_001 = "$temp_dir\v-sekai-godot-templates-symbols.zip.001"
-& curl.exe -L -o $symbols_file_001 $symbols_url_001
-if ($LASTEXITCODE -ne 0) { throw 'Symbols 001 download failed' }
+$symbols_file_002 = "$temp_dir\v-sekai-godot-templates-symbols.zip.002"
 $hash = Get-FileHash $symbols_file_001 -Algorithm SHA256
 if ($hash.Hash -ne $symbols_sha256_001) { throw 'Symbols 001 hash mismatch' }
-
-$symbols_url_002 = "https://github.com/V-Sekai/world-godot/releases/download/$release_version/v-sekai-godot-templates-symbols.zip.002"
-$symbols_sha256_002 = '5DF25D79D4C862E314C9E78101A2489F88DEEC733FE76C546EB2DDC151CBBD37'
-$symbols_file_002 = "$temp_dir\v-sekai-godot-templates-symbols.zip.002"
-& curl.exe -L -o $symbols_file_002 $symbols_url_002
-if ($LASTEXITCODE -ne 0) { throw 'Symbols 002 download failed' }
 $hash = Get-FileHash $symbols_file_002 -Algorithm SHA256
 if ($hash.Hash -ne $symbols_sha256_002) { throw 'Symbols 002 hash mismatch' }
 
@@ -61,13 +56,21 @@ if ($LASTEXITCODE -ne 0) { throw 'Templates zip extraction failed' }
 & 7z x $symbols_combined "-o$extract_temp" -y | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'Symbols zip extraction failed' }
 
-$version_file = Get-ChildItem $extract_temp -Filter version.txt -Recurse | Select-Object -First 1
-if ($version_file) {
-    $template_version = (Get-Content $version_file.FullName -Raw).Trim()
-} else {
-    throw 'Could not find version.txt'
-}
+# Always extract all .tpz in extract_temp (repeat until none left)
+do {
+    $tpz_list = Get-ChildItem $extract_temp -Filter *.tpz -Recurse -File -ErrorAction SilentlyContinue
+    foreach ($tpz in $tpz_list) {
+        & 7z x $tpz.FullName "-o$extract_temp" -y | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "tpz extraction failed: $($tpz.FullName)" }
+        Remove-Item $tpz.FullName -Force
+    }
+} while ((Get-ChildItem $extract_temp -Filter *.tpz -Recurse -File -ErrorAction SilentlyContinue))
 
+$version_file = Get-ChildItem $extract_temp -Filter version.txt -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+if (-not $version_file) { throw 'Could not find version.txt' }
+$template_version = (Get-Content $version_file.FullName -Raw).Trim()
+
+# Target folder is named from version.txt so Godot finds templates by version
 $templates_dir = "$base_templates_dir\$template_version"
 New-Item -ItemType Directory -Path $templates_dir -Force | Out-Null
 Get-ChildItem $extract_temp -Recurse | Where-Object { -not $_.PSIsContainer } | ForEach-Object {
@@ -76,6 +79,16 @@ Get-ChildItem $extract_temp -Recurse | Where-Object { -not $_.PSIsContainer } | 
     New-Item -ItemType Directory -Path $target_dir -Force | Out-Null
     Move-Item $_.FullName $target -Force
 }
+
+# Extract any .tpz into the version-named folder (repeat until none left)
+do {
+    $tpz_list = Get-ChildItem $templates_dir -Filter *.tpz -Recurse -File -ErrorAction SilentlyContinue
+    foreach ($tpz in $tpz_list) {
+        & 7z x $tpz.FullName "-o$templates_dir" -y | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "tpz extraction failed: $($tpz.FullName)" }
+        Remove-Item $tpz.FullName -Force
+    }
+} while ((Get-ChildItem $templates_dir -Filter *.tpz -Recurse -File -ErrorAction SilentlyContinue))
 
 $version_txt_path = "$templates_dir\version.txt"
 if (-not (Test-Path $version_txt_path)) { Set-Content $version_txt_path $template_version }

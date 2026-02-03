@@ -1,18 +1,18 @@
 {
-    "version": "latest.v-sekai-editor-279.5",
+    "version": "latest.v-sekai-editor-280",
     "description": "V-Sekai Godot export templates (for use with v-sekai-godot editor)",
     "homepage": "https://github.com/V-Sekai/world-godot",
     "license": "MIT",
-    "depends": ["7zip", "curl"],
+    "depends": ["7zip", "gh"],
     "architecture": {
         "64bit": {
-            "url": "https://github.com/V-Sekai/world-godot/releases/download/latest.v-sekai-editor-279/v-sekai-godot-templates.zip.001",
+            "url": "https://github.com/V-Sekai/world-godot/releases/download/latest.v-sekai-editor-280/v-sekai-godot-templates.zip.001",
             "hash": "bfd7a64a0e1f477f642a90c111af73425ab172f7c40abe5109935b6c73904c79"
         }
     },
     "installer": {
         "script": [
-            "curl.exe -L -o \"$dir\\v-sekai-godot-templates-install.ps1\" \"https://raw.githubusercontent.com/V-Sekai/v-sekai-scoop-world/main/scripts/v-sekai-godot-templates-install.ps1\"",
+            "powershell -ExecutionPolicy Bypass -Command \"$b64 = (gh api repos/V-Sekai/v-sekai-scoop-world/contents/scripts/v-sekai-godot-templates-install.ps1 -q .content) -replace '\\s',''; [System.IO.File]::WriteAllText(\\\"$dir\\\\v-sekai-godot-templates-install.ps1\\\", [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($b64)))\"",
             "powershell -ExecutionPolicy Bypass -File \"$dir\\v-sekai-godot-templates-install.ps1\""
         ]
     }

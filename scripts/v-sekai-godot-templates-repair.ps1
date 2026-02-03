@@ -1,8 +1,8 @@
 # Repair: complete extraction from existing .tmp_* folder and move to versioned subdir.
 # Run when v-sekai-godot-templates install left files in .tmp_* without extracting.
-# Usage: run from any dir; uses %APPDATA%\Godot\export_templates\.tmp_latest.v-sekai-editor-279
+# Usage: run from any dir; uses %APPDATA%\Godot\export_templates\.tmp_latest.v-sekai-editor-280
 $base_templates_dir = "$env:APPDATA\Godot\export_templates"
-$release_version = 'latest.v-sekai-editor-279'
+$release_version = 'latest.v-sekai-editor-280'
 $temp_dir = "$base_templates_dir\.tmp_$release_version"
 
 if (-not (Test-Path $temp_dir)) {
@@ -41,10 +41,18 @@ if (Test-Path $symbols_combined) {
     if ($LASTEXITCODE -ne 0) { throw 'Symbols extraction failed' }
 }
 
+do {
+    $tpz_list = Get-ChildItem $extract_temp -Filter *.tpz -Recurse -File -ErrorAction SilentlyContinue
+    foreach ($tpz in $tpz_list) {
+        Write-Host "Extracting tpz: $($tpz.Name)"
+        & 7z x $tpz.FullName "-o$extract_temp" -y | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "tpz extraction failed: $($tpz.FullName)" }
+        Remove-Item $tpz.FullName -Force
+    }
+} while ((Get-ChildItem $extract_temp -Filter *.tpz -Recurse -File -ErrorAction SilentlyContinue))
+
 $version_file = Get-ChildItem $extract_temp -Filter version.txt -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-if (-not $version_file) {
-    throw 'version.txt not found under extract. Extraction may be incomplete.'
-}
+if (-not $version_file) { throw 'version.txt not found under extract. Extraction may be incomplete.' }
 $template_version = (Get-Content $version_file.FullName -Raw).Trim()
 Write-Host "Version from version.txt: $template_version"
 
@@ -57,6 +65,17 @@ Get-ChildItem $extract_temp -Recurse | Where-Object { -not $_.PSIsContainer } | 
     if (-not (Test-Path $target_dir)) { New-Item -ItemType Directory -Path $target_dir -Force | Out-Null }
     Move-Item $_.FullName $target -Force
 }
+
+do {
+    $tpz_list = Get-ChildItem $templates_dir -Filter *.tpz -Recurse -File -ErrorAction SilentlyContinue
+    foreach ($tpz in $tpz_list) {
+        Write-Host "Extracting tpz into version folder: $($tpz.Name)"
+        & 7z x $tpz.FullName "-o$templates_dir" -y | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "tpz extraction failed: $($tpz.FullName)" }
+        Remove-Item $tpz.FullName -Force
+    }
+} while ((Get-ChildItem $templates_dir -Filter *.tpz -Recurse -File -ErrorAction SilentlyContinue))
+
 $version_txt_path = Join-Path $templates_dir 'version.txt'
 if (-not (Test-Path $version_txt_path)) { Set-Content $version_txt_path $template_version }
 
