@@ -49,21 +49,11 @@ New-Item -ItemType Directory -Path $extract_temp -Force | Out-Null
 & 7z x $templates_combined "-o$extract_temp" -y | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'Templates zip extraction failed' }
 
-# Step 2: Extract all .tpz (repeat until none left; .tpz may contain nested .tpz)
-do {
-    $tpz_list = Get-ChildItem $extract_temp -Filter *.tpz -Recurse -File
-    foreach ($tpz in $tpz_list) {
-        & 7z x $tpz.FullName "-o$extract_temp" -y | Out-Null
-        if ($LASTEXITCODE -ne 0) { throw "tpz extraction failed: $($tpz.FullName)" }
-        Remove-Item $tpz.FullName -Force
-    }
-} while ((Get-ChildItem $extract_temp -Filter *.tpz -Recurse -File -ErrorAction SilentlyContinue))
-
-# Step 3: Extract symbols zip (no .tpz inside; just adds symbol files)
+# Step 2: Extract symbols zip
 & 7z x $symbols_combined "-o$extract_temp" -y | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'Symbols zip extraction failed' }
 
-# Step 4: Target subdir from version.txt (e.g. 4.6.stable.double)
+# Step 3: Target subdir from version.txt (e.g. 4.6.stable.double)
 $version_file = Get-ChildItem $extract_temp -Filter version.txt -Recurse | Select-Object -First 1
 if ($version_file) {
     $template_version = (Get-Content $version_file.FullName -Raw).Trim()
