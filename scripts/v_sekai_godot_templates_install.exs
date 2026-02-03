@@ -9,8 +9,6 @@ base_templates_dir = Path.join(System.get_env("APPDATA", ""), "Godot/export_temp
 temp_dir = Path.join(base_templates_dir, ".tmp_#{release_version}")
 
 templates_tpz_sha256 = "9BBEA79A650EDAFAA1574FA5B942DB05DCE2B74D972EDC9D8242AF50A13C2A43"
-symbols_sha256_001 = "6662AF45769AAA1ED463F7C2CF58E593F0C2C5AE5FB824AE68B81FA5497B2436"
-symbols_sha256_002 = "A7ABD1E91E74EAA3767DBE98577DFAFB1863ECE458B11E4361E0221D081E3C26"
 
 defmodule Install do
   def run_7z(archive, out_dir) do
@@ -30,14 +28,6 @@ defmodule Install do
     |> Enum.find_value(fn line ->
       trimmed = String.trim(line)
       if String.match?(trimmed, ~r/^[a-fA-F0-9]{64}$/), do: String.upcase(trimmed)
-    end)
-  end
-
-  def merge_files(paths, out_path) do
-    File.open!(out_path, [:write, :binary], fn out ->
-      for path <- paths do
-        File.stream!(path, [], 64 * 1024) |> Enum.each(&IO.binwrite(out, &1))
-      end
     end)
   end
 
@@ -97,25 +87,10 @@ else
   if hash != templates_tpz_sha256, do: raise("Templates tpz hash mismatch")
 end
 
-symbols_001 = Path.join(temp_dir, "v-sekai-godot-templates-symbols.zip.001")
-symbols_002 = Path.join(temp_dir, "v-sekai-godot-templates-symbols.zip.002")
-
-if Install.download("#{base_url}/v-sekai-godot-templates-symbols.zip.001", symbols_001) != 0,
-  do: raise("Symbols 001 download failed")
-if Install.download("#{base_url}/v-sekai-godot-templates-symbols.zip.002", symbols_002) != 0,
-  do: raise("Symbols 002 download failed")
-
-if Install.file_sha256_win(symbols_001) != symbols_sha256_001, do: raise("Symbols 001 hash mismatch")
-if Install.file_sha256_win(symbols_002) != symbols_sha256_002, do: raise("Symbols 002 hash mismatch")
-
-symbols_combined = Path.join(temp_dir, "v-sekai-godot-templates-symbols.zip")
-Install.merge_files([symbols_001, symbols_002], symbols_combined)
-
 extract_temp = Path.join(temp_dir, "extract")
 File.mkdir_p!(extract_temp)
 
 if Install.run_7z(tpz_path, extract_temp) != 0, do: raise("Templates tpz extraction failed")
-if Install.run_7z(symbols_combined, extract_temp) != 0, do: raise("Symbols zip extraction failed")
 
 Install.extract_tpz_loop(extract_temp)
 
