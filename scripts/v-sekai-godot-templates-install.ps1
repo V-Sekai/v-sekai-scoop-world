@@ -1,5 +1,5 @@
 # Install export templates for V-Sekai Godot (run by Scoop installer for v-sekai-godot-templates)
-# Use gh release download for assets. If v-sekai-godot-templates.zip.001 exists in app dir (Scoop cache), use it.
+# Use gh release download for assets. If v-sekai-godot-templates.tpz exists in app dir (Scoop cache), use it.
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $scriptDir
 
@@ -9,26 +9,23 @@ $base_templates_dir = "$env:APPDATA\Godot\export_templates"
 $temp_dir = "$base_templates_dir\.tmp_$release_version"
 New-Item -ItemType Directory -Path $temp_dir -Force | Out-Null
 
-$templates_combined = "$temp_dir\v-sekai-godot-templates.zip"
-$templates_sha256 = 'BFD7A64A0E1F477F642A90C111AF73425AB172F7C40ABE5109935B6C73904C79'
-$cached_001 = Join-Path $scriptDir 'v-sekai-godot-templates.zip.001'
-if (Test-Path $cached_001) {
-    Copy-Item $cached_001 $temp_dir
-    $templates_file_001 = "$temp_dir\v-sekai-godot-templates.zip.001"
-    $hash = Get-FileHash $templates_file_001 -Algorithm SHA256
-    if ($hash.Hash -ne $templates_sha256) { throw 'Templates hash mismatch (cached file)' }
-    Copy-Item $templates_file_001 $templates_combined
+$templates_tpz_sha256 = '9BBEA79A650EDAFAA1574FA5B942DB05DCE2B74D972EDC9D8242AF50A13C2A43'
+$cached_tpz = Join-Path $scriptDir 'v-sekai-godot-templates.tpz'
+if (Test-Path $cached_tpz) {
+    Copy-Item $cached_tpz $temp_dir
+    $tpz_path = "$temp_dir\v-sekai-godot-templates.tpz"
+    $hash = Get-FileHash $tpz_path -Algorithm SHA256
+    if ($hash.Hash -ne $templates_tpz_sha256) { throw 'Templates tpz hash mismatch (cached file)' }
 } else {
-    gh release download $release_version --repo $repo -D $temp_dir --pattern 'v-sekai-godot-templates.zip.001'
-    if ($LASTEXITCODE -ne 0) { throw 'Templates download failed' }
-    $templates_file_001 = "$temp_dir\v-sekai-godot-templates.zip.001"
-    $hash = Get-FileHash $templates_file_001 -Algorithm SHA256
-    if ($hash.Hash -ne $templates_sha256) { throw 'Templates hash mismatch' }
-    Copy-Item $templates_file_001 $templates_combined
+    gh release download $release_version --repo $repo -D $temp_dir --pattern 'v-sekai-godot-templates.tpz'
+    if ($LASTEXITCODE -ne 0) { throw 'Templates tpz download failed' }
+    $tpz_path = "$temp_dir\v-sekai-godot-templates.tpz"
+    $hash = Get-FileHash $tpz_path -Algorithm SHA256
+    if ($hash.Hash -ne $templates_tpz_sha256) { throw 'Templates tpz hash mismatch' }
 }
 
-$symbols_sha256_001 = 'E3FC838F3F8A8520EE2346FBE417F85F748699A0B38F062E4881FB2003BAE5CA'
-$symbols_sha256_002 = '5DF25D79D4C862E314C9E78101A2489F88DEEC733FE76C546EB2DDC151CBBD37'
+$symbols_sha256_001 = '6662AF45769AAA1ED463F7C2CF58E593F0C2C5AE5FB824AE68B81FA5497B2436'
+$symbols_sha256_002 = 'A7ABD1E91E74EAA3767DBE98577DFAFB1863ECE458B11E4361E0221D081E3C26'
 gh release download $release_version --repo $repo -D $temp_dir --pattern 'v-sekai-godot-templates-symbols.zip.001' --pattern 'v-sekai-godot-templates-symbols.zip.002'
 if ($LASTEXITCODE -ne 0) { throw 'Symbols download failed' }
 $symbols_file_001 = "$temp_dir\v-sekai-godot-templates-symbols.zip.001"
@@ -50,8 +47,8 @@ try {
 $extract_temp = "$temp_dir\extract"
 New-Item -ItemType Directory -Path $extract_temp -Force | Out-Null
 
-& 7z x $templates_combined "-o$extract_temp" -y | Out-Null
-if ($LASTEXITCODE -ne 0) { throw 'Templates zip extraction failed' }
+& 7z x $tpz_path "-o$extract_temp" -y | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Templates tpz extraction failed' }
 
 & 7z x $symbols_combined "-o$extract_temp" -y | Out-Null
 if ($LASTEXITCODE -ne 0) { throw 'Symbols zip extraction failed' }

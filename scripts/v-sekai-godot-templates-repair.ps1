@@ -10,19 +10,19 @@ if (-not (Test-Path $temp_dir)) {
 }
 
 $extract_temp = Join-Path $temp_dir 'extract'
-$templates_combined = "$temp_dir\v-sekai-godot-templates.zip"
+$templates_tpz = "$temp_dir\v-sekai-godot-templates.tpz"
 $symbols_001 = "$temp_dir\v-sekai-godot-templates-symbols.zip.001"
 $symbols_002 = "$temp_dir\v-sekai-godot-templates-symbols.zip.002"
 $symbols_combined = "$temp_dir\v-sekai-godot-templates-symbols.zip"
 
 New-Item -ItemType Directory -Path $extract_temp -Force | Out-Null
 
-if (Test-Path $templates_combined) {
-    Write-Host 'Extracting templates zip...'
-    & 7z x $templates_combined "-o$extract_temp" -y | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw 'Templates extraction failed' }
+if (Test-Path $templates_tpz) {
+    Write-Host 'Extracting templates tpz...'
+    & 7z x $templates_tpz "-o$extract_temp" -y | Out-Null
+    if ($LASTEXITCODE -ne 0) { throw 'Templates tpz extraction failed' }
 } else {
-    throw "Templates zip not found: $templates_combined"
+    throw "Templates tpz not found: $templates_tpz"
 }
 
 if (-not (Test-Path $symbols_combined) -and (Test-Path $symbols_001) -and (Test-Path $symbols_002)) {
