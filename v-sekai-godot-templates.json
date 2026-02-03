@@ -1,5 +1,5 @@
 {
-    "version": "latest.v-sekai-editor-279",
+    "version": "latest.v-sekai-editor-279.1",
     "description": "V-Sekai Godot export templates (for use with v-sekai-godot editor)",
     "homepage": "https://github.com/V-Sekai/world-godot",
     "license": "MIT",
@@ -12,7 +12,7 @@
     },
     "installer": {
         "script": [
-            "powershell -ExecutionPolicy Bypass -Command \"Set-Location $dir; $scriptPath = Join-Path $env:TEMP 'v-sekai-godot-templates-install.ps1'; curl.exe -L -o $scriptPath 'https://raw.githubusercontent.com/V-Sekai/v-sekai-scoop-world/main/scripts/v-sekai-godot-templates-install.ps1'; & $scriptPath\""
+            "powershell -ExecutionPolicy Bypass -Command \"Set-Location $dir; $scriptPath = Join-Path $env:TEMP 'v-sekai-godot-templates-install.ps1'; curl.exe -L -o $scriptPath 'https://raw.githubusercontent.com/V-Sekai/v-sekai-scoop-world/main/scripts/v-sekai-godot-templates-install.ps1'; ^& $scriptPath\""
         ]
     }
 }
