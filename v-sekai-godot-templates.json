@@ -1,5 +1,5 @@
 {
-    "version": "latest.v-sekai-editor-280.10",
+    "version": "latest.v-sekai-editor-280.11",
     "description": "V-Sekai Godot export templates (for use with v-sekai-godot editor)",
     "homepage": "https://github.com/V-Sekai/world-godot",
     "license": "MIT",
@@ -7,7 +7,7 @@
     "architecture": {
         "64bit": {
             "url": "https://raw.githubusercontent.com/V-Sekai/v-sekai-scoop-world/4389007c5ca10a344824b96a15347677cd9d7420/scripts/v_sekai_godot_templates_install.exs",
-            "hash": "41afac933127f84685d485f7b0e36e3509f730de38442e6ef3247a83d7b8a023"
+            "hash": "db8f13aeea5bb36b5f3e1063c85bc6fedcc5f0412902717899eed42cf69c7025"
         }
     },
     "installer": {
