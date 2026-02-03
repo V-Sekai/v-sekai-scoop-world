@@ -1,5 +1,8 @@
 # Install export templates for V-Sekai Godot (run by Scoop installer for v-sekai-godot-templates)
-# Use curl.exe for downloads. If v-sekai-godot-templates.zip.001 exists in current dir (Scoop cache), use it.
+# Use curl.exe for downloads. If v-sekai-godot-templates.zip.001 exists in app dir (Scoop cache), use it.
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+Set-Location $scriptDir
+
 $release_version = 'latest.v-sekai-editor-279'
 $base_templates_dir = "$env:APPDATA\Godot\export_templates"
 $temp_dir = "$base_templates_dir\.tmp_$release_version"
@@ -7,7 +10,7 @@ New-Item -ItemType Directory -Path $temp_dir -Force | Out-Null
 
 $templates_combined = "$temp_dir\v-sekai-godot-templates.zip"
 $templates_sha256 = 'BFD7A64A0E1F477F642A90C111AF73425AB172F7C40ABE5109935B6C73904C79'
-$cached_001 = Join-Path (Get-Location) 'v-sekai-godot-templates.zip.001'
+$cached_001 = Join-Path $scriptDir 'v-sekai-godot-templates.zip.001'
 if (Test-Path $cached_001) {
     Copy-Item $cached_001 $temp_dir
     $templates_file_001 = "$temp_dir\v-sekai-godot-templates.zip.001"
