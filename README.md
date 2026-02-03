@@ -26,6 +26,8 @@ scoop install v-sekai-scoop-world/<app_name>
 
 - **v-sekai-godot**: V-Sekai custom Godot editor
   - Command: `v-sekai-godot`
+- **v-sekai-godot-templates**: V-Sekai Godot export templates (install to `%APPDATA%\Godot\export_templates\<version>` for use with v-sekai-godot)
+  - No command; data-only app. Install separately if you need to export projects.
 - **v-sekai-game**: V-Sekai Game
   - Command: `v-sekai-game`
 - **v-sekai-dev**: V-Sekai Game (Development/Testing Build)

@@ -15,6 +15,7 @@ We use `gh release view <tag> --repo <org/repo> --json assets` to get SHA256 dig
 - **Manifest format**: One JSON file per app (e.g. `v-sekai-godot.json`, `tool-model-explorer.json`). Fields: `version`, `url`, `hash`, `bin`, `description`, `homepage`, `license`.
 - **Hash**: Use the lowercase hex from the release asset `digest` (SHA256). Required when the download URL changes.
 - **Bin**: If the executable name changes in a new release, update the first element of the `bin` array; keep the alias (second element) stable when possible.
-- **Godot manifest**: The installer script downloads templates and symbols; update `$release_version` and the three SHA256 variables in the script when upgrading the editor release.
+- **Godot editor** (`v-sekai-godot.json`): Editor zip only; no installer script.
+- **Godot templates** (`v-sekai-godot-templates.json`): The installer script downloads templates and symbols; update `$release_version` and the three SHA256 variables in `scripts/v-sekai-godot-templates-install.ps1` when upgrading the release.
 
 Detailed steps: [Update Scoop Manifest Workflow](.clinerules/workflows/update-scoop-manifest.md).
