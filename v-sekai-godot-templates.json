@@ -1,5 +1,5 @@
 {
-    "version": "latest.v-sekai-editor-280.5",
+    "version": "latest.v-sekai-editor-280.6",
     "description": "V-Sekai Godot export templates (for use with v-sekai-godot editor)",
     "homepage": "https://github.com/V-Sekai/world-godot",
     "license": "MIT",
@@ -12,7 +12,7 @@
     },
     "installer": {
         "script": [
-            "elixir \"scripts\\v_sekai_godot_templates_install.exs\""
+            "powershell -NoProfile -Command \"& elixir (Join-Path $env:SCOOP_HOME 'buckets\\v-sekai-scoop-world\\scripts\\v_sekai_godot_templates_install.exs')\""
         ]
     }
 }
