@@ -10,6 +10,8 @@ temp_dir = Path.join(base_templates_dir, ".tmp_#{release_version}")
 
 templates_tpz_sha256 = "9BBEA79A650EDAFAA1574FA5B942DB05DCE2B74D972EDC9D8242AF50A13C2A43"
 
+IO.puts("v-sekai-godot-templates: install starting (templates -> #{base_templates_dir})")
+
 defmodule Install do
   def run_7z(archive, out_dir) do
     {_, status} = System.cmd("7z", ["x", archive, "-o#{out_dir}", "-y"], stderr_to_stdout: true)
@@ -77,21 +79,26 @@ tpz_path = Path.join(temp_dir, "v-sekai-godot-templates.tpz")
 cached_tpz = Path.join(script_dir, "v-sekai-godot-templates.tpz")
 
 if File.exists?(cached_tpz) do
+  IO.puts("v-sekai-godot-templates: stage templates from cache")
   File.cp!(cached_tpz, tpz_path)
   hash = Install.file_sha256_win(tpz_path)
   if hash != templates_tpz_sha256, do: raise("Templates tpz hash mismatch (cached file)")
 else
+  IO.puts("v-sekai-godot-templates: stage download templates")
   if Install.download("#{base_url}/v-sekai-godot-templates.tpz", tpz_path) != 0,
     do: raise("Templates tpz download failed")
   hash = Install.file_sha256_win(tpz_path)
   if hash != templates_tpz_sha256, do: raise("Templates tpz hash mismatch")
 end
+IO.puts("v-sekai-godot-templates: stage templates verified")
 
 extract_temp = Path.join(temp_dir, "extract")
 File.mkdir_p!(extract_temp)
 
+IO.puts("v-sekai-godot-templates: stage extract tpz")
 if Install.run_7z(tpz_path, extract_temp) != 0, do: raise("Templates tpz extraction failed")
 
+IO.puts("v-sekai-godot-templates: stage extract nested tpz")
 Install.extract_tpz_loop(extract_temp)
 
 version_file = Install.find_version_txt(extract_temp)
@@ -101,10 +108,15 @@ template_version = version_file |> File.read!() |> String.trim()
 templates_dir = Path.join(base_templates_dir, template_version)
 File.mkdir_p!(templates_dir)
 
+IO.puts("v-sekai-godot-templates: stage move to #{template_version}")
 Install.move_all_files(extract_temp, templates_dir)
+
+IO.puts("v-sekai-godot-templates: stage extract nested tpz in templates dir")
 Install.extract_tpz_loop(templates_dir)
 
 version_txt_path = Path.join(templates_dir, "version.txt")
 unless File.exists?(version_txt_path), do: File.write!(version_txt_path, template_version)
 
+IO.puts("v-sekai-godot-templates: stage cleanup")
 File.rm_rf(temp_dir)
+IO.puts("v-sekai-godot-templates: install done")
