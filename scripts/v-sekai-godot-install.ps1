@@ -44,12 +44,26 @@ try {
 $extract_temp = "$temp_dir\extract"
 New-Item -ItemType Directory -Path $extract_temp -Force | Out-Null
 # Use 7z (Scoop has 7zip) for extraction; -o has no space before path, -y = overwrite
+
+# Step 1: Extract v-sekai-godot-templates.zip
 & 7z x $templates_combined "-o$extract_temp" -y | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Templates zip extraction failed' }
+
+# Step 2: Extract all .tpz (repeat until none left; .tpz may contain nested .tpz)
+do {
+    $tpz_list = Get-ChildItem $extract_temp -Filter *.tpz -Recurse -File
+    foreach ($tpz in $tpz_list) {
+        & 7z x $tpz.FullName "-o$extract_temp" -y | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw "tpz extraction failed: $($tpz.FullName)" }
+        Remove-Item $tpz.FullName -Force
+    }
+} while ((Get-ChildItem $extract_temp -Filter *.tpz -Recurse -File -ErrorAction SilentlyContinue))
+
+# Step 3: Extract symbols zip (no .tpz inside; just adds symbol files)
 & 7z x $symbols_combined "-o$extract_temp" -y | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Symbols zip extraction failed' }
 
-$tpz = Get-ChildItem $extract_temp -Filter *.tpz -Recurse | Select-Object -First 1
-if ($tpz) { & 7z x $tpz.FullName "-o$extract_temp" -y | Out-Null }
-
+# Step 4: Target subdir from version.txt (e.g. 4.6.stable.double)
 $version_file = Get-ChildItem $extract_temp -Filter version.txt -Recurse | Select-Object -First 1
 if ($version_file) {
     $template_version = (Get-Content $version_file.FullName -Raw).Trim()
