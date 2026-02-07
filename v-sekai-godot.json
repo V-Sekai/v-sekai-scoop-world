@@ -6,7 +6,7 @@
     "architecture": {
         "64bit": {
             "url": "https://github.com/V-Sekai/world-godot/releases/download/latest.v-sekai-editor-281/v-sekai-godot-windows.zip",
-            "hash": "c2ba288d334108ebc5654647e23864277938fb5cd4049410f6dc3df4f40ace00",
+            "hash": "40359784903234816b0622762ce4543681ac34db55572ab19e201b13f0e695cd",
             "extract_dir": "v-sekai-godot-windows"
         }
     },
